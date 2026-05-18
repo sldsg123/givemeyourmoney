@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inter Club Chao CN 会员信息收集</title>
+    <meta
+      name="description"
+      content="Inter Club Chao CN 旧会员续费与新会员入会信息收集表。"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Inter Club Chao CN</p>
+        <h1 id="page-title">会员信息收集</h1>
+        <p class="lede">
+          请根据实际情况选择旧会员续费或新会员入会，并填写对应会员信息。
+        </p>
+
+        <div class="signal-panel" aria-label="信息流程">
+          <div>
+            <span class="signal-dot signal-dot--ready"></span>
+            <span>旧会员续费</span>
+          </div>
+          <div>
+            <span class="signal-dot signal-dot--send"></span>
+            <span>新会员入会</span>
+          </div>
+          <div>
+            <span class="signal-dot signal-dot--save"></span>
+            <span>信息确认</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-card" aria-labelledby="form-title">
+        <h2 id="form-title">会员登记</h2>
+
+        <form class="registration-form" data-form>
+          <label>
+            办理类型
+            <select name="memberType" data-member-type required>
+              <option value="">请选择</option>
+              <option value="renewal">旧会员续费</option>
+              <option value="new">新会员入会</option>
+            </select>
+          </label>
+
+          <div class="notice-panel" data-new-member-note hidden>
+            <p>
+              新会员请先前往国际米兰官网完成信息录入，再回到本页提交信息。
+            </p>
+            <a
+              class="official-link"
+              href="https://interclub.inter.it/confermadati/iscrizione?id_club=4045&lang=en"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              前往官网录入信息
+            </a>
+
+            <label class="consent-row">
+              <input
+                name="officialRegistrationComplete"
+                type="checkbox"
+                value="yes"
+                data-official-confirmation
+              />
+              <span>我已完成官网信息录入</span>
+            </label>
+          </div>
+
+          <label>
+            姓名
+            <input
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              maxlength="120"
+              placeholder="填写联系人姓名"
+            />
+          </label>
+
+          <label>
+            微信号
+            <input
+              name="wechatId"
+              type="text"
+              required
+              maxlength="120"
+              placeholder="填写微信号"
+            />
+          </label>
+
+          <div class="field-grid">
+            <label>
+              成人会员人数
+              <select name="adults" required>
+                <option value="">请选择</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </label>
+
+            <label>
+              儿童会员人数
+              <select name="junior" required>
+                <option value="">请选择</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            会员姓名
+            <input
+              name="memberNames"
+              type="text"
+              required
+              maxlength="500"
+              placeholder="例如：张三、李四、王五"
+            />
+          </label>
+
+          <label data-renewal-only hidden>
+            是否有信息变更
+            <select name="hasInfoChange" data-renewal-required>
+              <option value="">请选择</option>
+              <option value="无变更">无变更</option>
+              <option value="有变更">有变更</option>
+            </select>
+          </label>
+
+          <label>
+            物流地址
+            <textarea
+              name="shippingAddress"
+              required
+              maxlength="1000"
+              rows="4"
+              placeholder="填写可收件的详细地址"
+            ></textarea>
+          </label>
+
+          <label>
+            备注
+            <input
+              name="notes"
+              type="text"
+              maxlength="500"
+              placeholder="可填写其他需要说明的信息"
+            />
+          </label>
+
+          <label class="honeypot" aria-hidden="true">
+            Website
+            <input name="website" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+
+          <button class="submit-button" type="submit">提交信息</button>
+          <p class="form-status" data-status role="status" aria-live="polite"></p>
+
+          <div class="test-panel" data-preview hidden>
+            <h3>最近一次测试提交</h3>
+            <dl data-preview-list></dl>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
