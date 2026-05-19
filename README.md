@@ -1,9 +1,10 @@
 # Inter Club Chao CN 会员信息收集
 
-这是一个静态网页 + Cloudflare Pages Function + Cloudflare D1 的会员信息收集站点。
+这是一个静态网页 + Cloudflare Worker + Cloudflare D1 的会员信息收集站点。
 
-前端静态文件在 `docs/`，提交接口在 `functions/api/submit.js`，D1 表结构在
-`cloudflare/schema.sql`。
+前端静态文件在 `docs/`，Worker 入口在 `worker/index.js`，D1 表结构在
+`cloudflare/schema.sql`。`functions/api/submit.js` 是旧版 Pages Functions 入口，
+如果你使用新版 Workers 静态资源部署，可以忽略它。
 
 ## 收集字段
 
@@ -56,9 +57,16 @@ http://localhost:8000
 
 ## Cloudflare D1 部署步骤
 
-注意：这个版本需要 Cloudflare Pages Function，所以正式部署请使用 Cloudflare
-Pages 连接 GitHub repo。不要继续把 GitHub Pages 当作生产站点，否则
-`/api/submit` 不存在，表单无法写入 D1。
+Cloudflare 新 UI 里通常显示为 **Workers & Pages**，创建时选择
+**Import a repository**。这个项目已经用 `wrangler.jsonc` 指定了静态文件目录：
+
+```jsonc
+"assets": {
+  "directory": "./docs"
+}
+```
+
+所以新版 Workers 部署流程里看不到 **Build output directory** 是正常的。
 
 ### 1. 创建 D1 Database
 
@@ -69,32 +77,35 @@ Pages 连接 GitHub repo。不要继续把 GitHub Pages 当作生产站点，否
 5. 创建后进入该数据库的 **Console**。
 6. 粘贴 `cloudflare/schema.sql` 的全部内容并执行。
 
-### 2. 创建 Cloudflare Pages 项目
+### 2. 创建 Cloudflare Worker 项目
 
 1. 进入 **Workers & Pages**。
 2. 点击 **Create application**。
-3. 选择 **Pages**，连接这个 GitHub repo。
-4. Build 设置：
-   - **Build command** 留空
-   - **Build output directory** 填 `docs`
-5. 部署。
+3. 选择 **Import a repository**。
+4. 选择这个 GitHub repo。
+5. 项目名建议填 `givemeyourmoney`，要和 `wrangler.jsonc` 里的 `name` 一致。
+6. Build command 可以留空。
+7. Deploy command 使用默认值 `npx wrangler deploy`。
+8. 保存并部署。
 
-### 3. 绑定 D1 到 Pages Function
+### 3. 绑定 D1 到 Worker
 
-1. 打开你的 Cloudflare Pages 项目。
-2. 进入 **Settings > Bindings**。
-3. 在 **Production** 环境添加 D1 database binding。
-4. **Variable name** 必须填：
+新版 UI 里 Bindings 是独立 tab，而且不一定显示 Production 环境，这是正常的。
+
+1. 打开刚创建的 Worker。
+2. 进入 **Bindings** tab。
+3. 点击 **Add binding**。
+4. 选择 **D1 database**。
+5. **Variable name** 必须填：
 
 ```text
 DB
 ```
 
-5. D1 database 选择刚创建的 `inter-club-chao-cn-members`。
-6. 保存后重新部署一次 Pages 项目。
+6. D1 database 选择刚创建的 `inter-club-chao-cn-members`。
+7. 保存后重新部署一次 Worker。
 
-绑定名必须是 `DB`，因为 `functions/api/submit.js` 使用的是
-`context.env.DB`。
+绑定名必须是 `DB`，因为 `worker/index.js` 使用的是 `env.DB`。
 
 ### 4. 连接表单接口
 
@@ -104,7 +115,7 @@ DB
 window.FORM_ENDPOINT = "/api/submit";
 ```
 
-部署到 Cloudflare Pages 后，表单会提交到同域名下的：
+部署到 Cloudflare Workers 后，表单会提交到同域名下的：
 
 ```text
 /api/submit
@@ -112,7 +123,7 @@ window.FORM_ENDPOINT = "/api/submit";
 
 ### 5. 测试提交
 
-1. 打开 Cloudflare Pages 生成的 `*.pages.dev` 地址。
+1. 打开 Cloudflare Worker 生成的 `*.workers.dev` 地址。
 2. 填写表单并提交。
 3. 页面提示“已提交，感谢填写。”
 4. 回到 D1 数据库，执行：
@@ -140,18 +151,14 @@ LIMIT 10;
 
 ## 绑定自定义域名
 
-建议把正式域名迁到 Cloudflare Pages，不再使用 GitHub Pages 作为生产站点。
+建议把正式域名迁到 Cloudflare Worker，不再使用 GitHub Pages 作为生产站点。
 
-1. 打开 Cloudflare Pages 项目。
-2. 进入 **Custom domains**。
+1. 打开 Cloudflare Worker。
+2. 进入 **Settings > Domains & Routes** 或 **Triggers > Custom Domains**。
 3. 添加 `www.givemeyourmoney.online`。
 4. 如果域名 DNS 已经在 Cloudflare，Cloudflare 会自动配置记录。
-5. 如果 DNS 不在 Cloudflare，需要在域名服务商添加 CNAME：
-
-```text
-Name: www
-Value: <你的项目名>.pages.dev
-```
+5. 如果 DNS 不在 Cloudflare，建议先把域名的 nameservers 切到 Cloudflare，
+   再用 Cloudflare 的 Custom Domain 流程绑定。
 
 完成后，用正式域名测试提交。
 
