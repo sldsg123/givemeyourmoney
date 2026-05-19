@@ -1,6 +1,9 @@
 # Inter Club Chao CN 会员信息收集
 
-这是一个静态网页表单，提交后可以通过 Google Apps Script 写入 Google Sheet。
+这是一个静态网页 + Cloudflare Pages Function + Cloudflare D1 的会员信息收集站点。
+
+前端静态文件在 `docs/`，提交接口在 `functions/api/submit.js`，D1 表结构在
+`cloudflare/schema.sql`。
 
 ## 收集字段
 
@@ -36,60 +39,121 @@
 
 ## 本地测试前端
 
-运行本地服务器：
+只测试页面 UI：
 
 ```sh
 python3 -m http.server 8000 --directory docs
 ```
 
-看到 `Serving HTTP on ...` 后不要关闭终端。打开浏览器访问：
+打开：
 
 ```text
 http://localhost:8000
 ```
 
-如果还没有配置 Google Apps Script URL，表单会把最近一次测试提交保存在浏览器
-`localStorage`，并显示在页面下方的 **最近一次测试提交**。
+这个本地静态服务器不会连接 D1，只会把最近一次测试提交保存在浏览器
+`localStorage` 并显示在页面下方。
 
-## 连接 Google Sheet
+## Cloudflare D1 部署步骤
 
-1. 创建一个新的 Google Sheet。
-2. 在表格里点击 **Extensions > Apps Script**。
-3. 删除默认代码，把 `apps-script/Code.gs` 的内容完整粘贴进去。
-4. 点击保存。
-5. 在 Apps Script 顶部函数下拉框选择 `setupSheet`。
-6. 点击 **Run**，按提示授权。
-7. 回到 Google Sheet，确认出现了 `会员信息` 工作表和表头。
+注意：这个版本需要 Cloudflare Pages Function，所以正式部署请使用 Cloudflare
+Pages 连接 GitHub repo。不要继续把 GitHub Pages 当作生产站点，否则
+`/api/submit` 不存在，表单无法写入 D1。
 
-## 部署 Apps Script
+### 1. 创建 D1 Database
 
-1. 在 Apps Script 右上角点击 **Deploy > New deployment**。
-2. 类型选择 **Web app**。
-3. **Execute as** 选择 **Me**。
-4. **Who has access** 选择 **Anyone**。
-5. 点击 **Deploy**。
-6. 复制 Web app URL。URL 应该以 `/exec` 结尾。
+1. 打开 Cloudflare Dashboard。
+2. 进入 **Storage & Databases > D1 SQL Database**。
+3. 点击 **Create Database**。
+4. 数据库名建议用：`inter-club-chao-cn-members`。
+5. 创建后进入该数据库的 **Console**。
+6. 粘贴 `cloudflare/schema.sql` 的全部内容并执行。
 
-## 连接网页
+### 2. 创建 Cloudflare Pages 项目
 
-打开 `docs/config.js`，把占位符替换成你的 Web app URL：
+1. 进入 **Workers & Pages**。
+2. 点击 **Create application**。
+3. 选择 **Pages**，连接这个 GitHub repo。
+4. Build 设置：
+   - **Build command** 留空
+   - **Build output directory** 填 `docs`
+5. 部署。
 
-```js
-window.FORM_ENDPOINT = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+### 3. 绑定 D1 到 Pages Function
+
+1. 打开你的 Cloudflare Pages 项目。
+2. 进入 **Settings > Bindings**。
+3. 在 **Production** 环境添加 D1 database binding。
+4. **Variable name** 必须填：
+
+```text
+DB
 ```
 
-然后刷新 `http://localhost:8000`，提交一条测试记录。页面提示提交成功后，到
-Google Sheet 的 `会员信息` 工作表检查是否新增了一行。
+5. D1 database 选择刚创建的 `inter-club-chao-cn-members`。
+6. 保存后重新部署一次 Pages 项目。
 
-## 更新 Apps Script 后重新部署
+绑定名必须是 `DB`，因为 `functions/api/submit.js` 使用的是
+`context.env.DB`。
 
-以后如果修改了 `apps-script/Code.gs`：
+### 4. 连接表单接口
 
-1. Apps Script 里点击 **Deploy > Manage deployments**。
-2. 选择当前 Web app deployment。
-3. 点击编辑。
-4. 选择 **New version**。
-5. 点击 **Deploy**。
+`docs/config.js` 已经设置为：
+
+```js
+window.FORM_ENDPOINT = "/api/submit";
+```
+
+部署到 Cloudflare Pages 后，表单会提交到同域名下的：
+
+```text
+/api/submit
+```
+
+### 5. 测试提交
+
+1. 打开 Cloudflare Pages 生成的 `*.pages.dev` 地址。
+2. 填写表单并提交。
+3. 页面提示“已提交，感谢填写。”
+4. 回到 D1 数据库，执行：
+
+```sql
+SELECT
+  id,
+  created_at,
+  member_type_label,
+  name,
+  wechat_id,
+  adults,
+  junior,
+  member_names,
+  has_info_change,
+  official_registration_complete,
+  shipping_address,
+  notes
+FROM member_submissions
+ORDER BY id DESC
+LIMIT 10;
+```
+
+确认新记录出现。
+
+## 绑定自定义域名
+
+建议把正式域名迁到 Cloudflare Pages，不再使用 GitHub Pages 作为生产站点。
+
+1. 打开 Cloudflare Pages 项目。
+2. 进入 **Custom domains**。
+3. 添加 `www.givemeyourmoney.online`。
+4. 如果域名 DNS 已经在 Cloudflare，Cloudflare 会自动配置记录。
+5. 如果 DNS 不在 Cloudflare，需要在域名服务商添加 CNAME：
+
+```text
+Name: www
+Value: <你的项目名>.pages.dev
+```
+
+完成后，用正式域名测试提交。
 
 ## 清除本地测试数据
 

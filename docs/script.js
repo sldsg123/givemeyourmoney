@@ -15,9 +15,12 @@
   );
   const storageKey = "latestMemberInfoSubmission";
   const endpoint = window.FORM_ENDPOINT || "";
+  const isLocalStaticServer =
+    ["localhost", "127.0.0.1"].includes(window.location.hostname) &&
+    window.location.port === "8000";
   const isConfigured =
-    endpoint.startsWith("https://script.google.com/") &&
-    endpoint.includes("/exec");
+    Boolean(endpoint) &&
+    endpoint !== "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 
   if (!form || !status || !submitButton || !memberTypeSelect) {
     return;
@@ -173,13 +176,25 @@
 
     try {
       if (isConfigured) {
-        setStatus("正在提交到 Google Sheet...");
-        await fetch(endpoint, {
-          method: "POST",
-          mode: "no-cors",
-          body: payload,
-        });
-        setStatus("已提交，请到 Google Sheet 确认记录。", "success");
+        if (isLocalStaticServer && endpoint.startsWith("/")) {
+          setStatus("本地静态测试已保存，部署到 Cloudflare 后会写入 D1。", "success");
+        } else {
+          setStatus("正在提交...");
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+            },
+            body: payload,
+          });
+          const result = await response.json();
+
+          if (!response.ok || !result.ok) {
+            throw new Error(result.error || "提交失败");
+          }
+
+          setStatus("已提交，感谢填写。", "success");
+        }
       } else {
         setStatus("测试提交已保存在当前浏览器。", "success");
       }
