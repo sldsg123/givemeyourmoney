@@ -17,6 +17,7 @@
 - 会员姓名
 - 是否有信息变更
 - 物流地址
+- 已付款
 - 备注
 
 新会员入会：
@@ -28,6 +29,7 @@
 - 儿童会员人数
 - 会员姓名
 - 物流地址
+- 已付款
 - 备注
 
 ## 会员费用
@@ -76,6 +78,14 @@ Cloudflare 新 UI 里通常显示为 **Workers & Pages**，创建时选择
 4. 数据库名建议用：`inter-club-chao-cn-members`。
 5. 创建后进入该数据库的 **Console**。
 6. 粘贴 `cloudflare/schema.sql` 的全部内容并执行。
+
+如果数据库已经创建过，并且只是给现有表增加“已付款”字段，请进入 D1 的
+**Console**，执行 `cloudflare/add_paid_column.sql`：
+
+```sql
+ALTER TABLE member_submissions
+ADD COLUMN paid TEXT NOT NULL DEFAULT '否';
+```
 
 ### 2. 创建 Cloudflare Worker 项目
 
@@ -141,6 +151,7 @@ SELECT
   has_info_change,
   official_registration_complete,
   shipping_address,
+  paid,
   notes
 FROM member_submissions
 ORDER BY id DESC

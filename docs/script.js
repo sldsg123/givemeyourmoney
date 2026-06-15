@@ -90,6 +90,7 @@
 
     rows.push(
       ["物流地址", record.shippingAddress],
+      ["已付款", record.paid],
       ["备注", record.notes || "无"],
       ["提交时间", new Date(record.submittedAt).toLocaleString("zh-CN")]
     );
@@ -160,6 +161,7 @@
           ? String(formData.get("officialRegistrationComplete") || "")
           : "",
       shippingAddress: String(formData.get("shippingAddress") || "").trim(),
+      paid: formData.get("paid") === "yes" ? "是" : "否",
       notes: String(formData.get("notes") || "").trim(),
       submittedAt: new Date().toISOString(),
     };

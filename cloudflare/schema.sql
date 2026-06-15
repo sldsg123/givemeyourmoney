@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS member_submissions (
   has_info_change TEXT,
   official_registration_complete TEXT,
   shipping_address TEXT NOT NULL,
+  paid TEXT NOT NULL DEFAULT '否',
   notes TEXT,
   page_url TEXT,
   user_agent TEXT,
