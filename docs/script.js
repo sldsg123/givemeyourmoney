@@ -13,6 +13,8 @@
   const renewalRequiredFields = document.querySelectorAll(
     "[data-renewal-required]"
   );
+  const newMemberOnlyFields = document.querySelectorAll("[data-new-member-only]");
+  const memberGiftNeeded = form?.elements.memberGiftNeeded;
   const storageKey = "latestMemberInfoSubmission";
   const endpoint = window.FORM_ENDPOINT || "";
   const isLocalStaticServer =
@@ -66,6 +68,14 @@
         field.value = "";
       }
     });
+
+    newMemberOnlyFields.forEach((field) => {
+      field.hidden = !isNewMember;
+    });
+
+    if (memberGiftNeeded && !isNewMember) {
+      memberGiftNeeded.checked = false;
+    }
   };
 
   const renderPreview = (record) => {
@@ -86,6 +96,7 @@
       rows.push(["是否有信息变更", record.hasInfoChange]);
     } else {
       rows.push(["官网信息录入", "已完成"]);
+      rows.push(["需要会员礼品", record.memberGiftNeeded]);
     }
 
     rows.push(
@@ -159,6 +170,12 @@
       officialRegistrationComplete:
         memberType === "new"
           ? String(formData.get("officialRegistrationComplete") || "")
+          : "",
+      memberGiftNeeded:
+        memberType === "new"
+          ? formData.get("memberGiftNeeded") === "yes"
+            ? "是"
+            : "否"
           : "",
       shippingAddress: String(formData.get("shippingAddress") || "").trim(),
       paid: formData.get("paid") === "yes" ? "是" : "否",

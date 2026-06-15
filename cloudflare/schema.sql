@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS member_submissions (
   member_names TEXT NOT NULL,
   has_info_change TEXT,
   official_registration_complete TEXT,
+  member_gift_needed TEXT NOT NULL DEFAULT '',
   shipping_address TEXT NOT NULL,
   paid TEXT NOT NULL DEFAULT '否',
   notes TEXT,

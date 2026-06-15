@@ -53,6 +53,12 @@ async function handleSubmit(request, env) {
       memberType === "new"
         ? clean(params.get("officialRegistrationComplete"), 20)
         : "";
+    const memberGiftNeeded =
+      memberType === "new"
+        ? clean(params.get("memberGiftNeeded"), 10) === "是"
+          ? "是"
+          : "否"
+        : "";
     const shippingAddress = clean(params.get("shippingAddress"), 1000);
     const paid = clean(params.get("paid"), 10) === "是" ? "是" : "否";
     const notes = clean(params.get("notes"), 500);
@@ -99,13 +105,14 @@ async function handleSubmit(request, env) {
         member_names,
         has_info_change,
         official_registration_complete,
+        member_gift_needed,
         shipping_address,
         paid,
         notes,
         page_url,
         user_agent,
         submitted_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         memberType,
@@ -117,6 +124,7 @@ async function handleSubmit(request, env) {
         memberNames,
         hasInfoChange,
         officialRegistrationComplete === "yes" ? "已完成" : "",
+        memberGiftNeeded,
         shippingAddress,
         paid,
         notes,

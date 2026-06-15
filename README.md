@@ -27,6 +27,7 @@
 - 微信号
 - 成人会员人数
 - 儿童会员人数
+- 需要会员礼品
 - 会员姓名
 - 物流地址
 - 已付款
@@ -86,6 +87,14 @@ Cloudflare 新 UI 里通常显示为 **Workers & Pages**，创建时选择
 ```sql
 ALTER TABLE member_submissions
 ADD COLUMN paid TEXT NOT NULL DEFAULT '否';
+```
+
+如果数据库已经创建过，并且只是给现有表增加“需要会员礼品”字段，请进入
+D1 的 **Console**，执行 `cloudflare/add_member_gift_needed_column.sql`：
+
+```sql
+ALTER TABLE member_submissions
+ADD COLUMN member_gift_needed TEXT NOT NULL DEFAULT '';
 ```
 
 ### 2. 创建 Cloudflare Worker 项目
@@ -151,6 +160,7 @@ SELECT
   member_names,
   has_info_change,
   official_registration_complete,
+  member_gift_needed,
   shipping_address,
   paid,
   notes
