@@ -144,7 +144,6 @@ async function handleSubmit(request, env) {
 
     return json({
       ok: true,
-      id: result.meta?.last_row_id || null,
     });
   } catch (error) {
     console.error(error);

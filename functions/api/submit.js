@@ -82,7 +82,7 @@ export async function onRequest(context) {
       return json({ ok: false, error: "请先确认已完成官网信息录入。" }, 400);
     }
 
-    const result = await context.env.DB.prepare(
+    await context.env.DB.prepare(
       `INSERT INTO member_submissions (
         member_type,
         member_type_label,
@@ -124,7 +124,6 @@ export async function onRequest(context) {
 
     return json({
       ok: true,
-      id: result.meta?.last_row_id || null,
     });
   } catch (error) {
     console.error(error);
