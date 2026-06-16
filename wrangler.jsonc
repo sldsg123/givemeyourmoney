@@ -14,6 +14,13 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "inter-club-chao-cn-members",
+      "database_id": "d60e8f47-f06b-4699-993b-0aecbab78ce9"
+    }
+  ],
   "observability": {
     "enabled": true
   }

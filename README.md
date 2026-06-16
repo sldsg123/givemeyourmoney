@@ -110,20 +110,18 @@ ADD COLUMN member_gift_needed TEXT NOT NULL DEFAULT '';
 
 ### 3. 绑定 D1 到 Worker
 
-新版 UI 里 Bindings 是独立 tab，而且不一定显示 Production 环境，这是正常的。
+D1 绑定已经写在 `wrangler.jsonc` 里，Cloudflare 每次从 GitHub 自动部署时会按
+配置绑定数据库：
 
-1. 打开刚创建的 Worker。
-2. 进入 **Bindings** tab。
-3. 点击 **Add binding**。
-4. 选择 **D1 database**。
-5. **Variable name** 必须填：
-
-```text
-DB
+```jsonc
+"d1_databases": [
+  {
+    "binding": "DB",
+    "database_name": "inter-club-chao-cn-members",
+    "database_id": "d60e8f47-f06b-4699-993b-0aecbab78ce9"
+  }
+]
 ```
-
-6. D1 database 选择刚创建的 `inter-club-chao-cn-members`。
-7. 保存后重新部署一次 Worker。
 
 绑定名必须是 `DB`，因为 `worker/index.js` 使用的是 `env.DB`。
 
