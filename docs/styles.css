@@ -133,9 +133,17 @@ h1 {
 }
 
 .form-card h2 {
-  margin-bottom: 22px;
+  margin-bottom: 0;
   font-size: 1.35rem;
   letter-spacing: 0;
+}
+
+.form-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
 }
 
 .registration-form {
@@ -269,6 +277,39 @@ textarea::placeholder {
   opacity: 0.62;
 }
 
+.secondary-button,
+.text-button,
+.icon-button {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.secondary-button {
+  min-height: 46px;
+  background: var(--accent-soft);
+  color: #d8ebff;
+  padding: 11px 16px;
+}
+
+.text-button {
+  background: transparent;
+  color: #79bbff;
+  padding: 4px 0;
+  text-align: right;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
 .form-status {
   min-height: 24px;
   margin: 0;
@@ -316,6 +357,45 @@ textarea::placeholder {
   overflow-wrap: anywhere;
   font-size: 0.92rem;
   font-weight: 650;
+}
+
+.member-dialog {
+  width: min(720px, calc(100% - 28px));
+  max-height: min(860px, calc(100vh - 28px));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  padding: clamp(20px, 4vw, 28px);
+}
+
+.member-dialog::backdrop {
+  background: rgb(0 0 0 / 64%);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.dialog-header h2 {
+  margin-bottom: 0;
+  font-size: 1.24rem;
+}
+
+.lookup-form {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.update-form {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
 }
 
 .fees-section {

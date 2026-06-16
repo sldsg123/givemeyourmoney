@@ -38,7 +38,12 @@
       </section>
 
       <section class="form-card" aria-labelledby="form-title">
-        <h2 id="form-title">会员登记</h2>
+        <div class="form-card-header">
+          <h2 id="form-title">会员登记</h2>
+          <button class="text-button" type="button" data-open-lookup>
+            查询/更新已有信息
+          </button>
+        </div>
 
         <form class="registration-form" data-form>
           <label>
@@ -200,6 +205,133 @@
           </div>
         </form>
       </section>
+
+      <dialog class="member-dialog" data-lookup-dialog>
+        <div class="dialog-header">
+          <h2>查询/更新已有信息</h2>
+          <button
+            class="icon-button"
+            type="button"
+            aria-label="关闭"
+            data-close-lookup
+          >
+            ×
+          </button>
+        </div>
+
+        <form class="lookup-form" data-lookup-form>
+          <div class="field-grid">
+            <label>
+              姓名
+              <input
+                name="name"
+                type="text"
+                required
+                maxlength="120"
+                placeholder="填写提交时的姓名"
+              />
+            </label>
+
+            <label>
+              微信号
+              <input
+                name="wechatId"
+                type="text"
+                required
+                maxlength="120"
+                placeholder="填写提交时的微信号"
+              />
+            </label>
+          </div>
+
+          <button class="secondary-button" type="submit">查询信息</button>
+          <p
+            class="form-status"
+            data-lookup-status
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+
+        <form class="registration-form update-form" data-update-form hidden>
+          <input name="id" type="hidden" />
+          <input name="lookupName" type="hidden" />
+          <input name="lookupWechatId" type="hidden" />
+
+          <label>
+            办理类型
+            <select name="memberType" data-update-member-type required>
+              <option value="renewal">旧会员续费</option>
+              <option value="new">新会员入会</option>
+            </select>
+          </label>
+
+          <div class="field-grid">
+            <label>
+              姓名
+              <input name="name" type="text" required maxlength="120" />
+            </label>
+
+            <label>
+              微信号
+              <input name="wechatId" type="text" required maxlength="120" />
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              成人会员人数
+              <input name="adults" type="number" min="0" max="10" required />
+            </label>
+
+            <label>
+              儿童会员人数
+              <input name="junior" type="number" min="0" max="10" required />
+            </label>
+          </div>
+
+          <label class="consent-row" data-update-new-member-only hidden>
+            <input name="memberGiftNeeded" type="checkbox" value="yes" />
+            <span>需要会员礼品</span>
+          </label>
+
+          <label>
+            会员姓名
+            <input name="memberNames" type="text" required maxlength="500" />
+          </label>
+
+          <label data-update-renewal-only hidden>
+            是否有信息变更
+            <select name="hasInfoChange" data-update-renewal-required>
+              <option value="">请选择</option>
+              <option value="无变更">无变更</option>
+              <option value="有变更">有变更</option>
+            </select>
+          </label>
+
+          <label>
+            物流地址
+            <textarea
+              name="shippingAddress"
+              required
+              maxlength="1000"
+              rows="4"
+            ></textarea>
+          </label>
+
+          <label class="consent-row">
+            <input name="paid" type="checkbox" value="yes" />
+            <span>已付款？</span>
+          </label>
+
+          <label>
+            备注
+            <input name="notes" type="text" maxlength="500" />
+          </label>
+
+          <button class="submit-button" type="submit">保存更新</button>
+        </form>
+      </dialog>
 
       <section class="fees-section" aria-labelledby="fees-title">
         <div class="section-heading">
