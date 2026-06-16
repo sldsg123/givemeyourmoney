@@ -82,6 +82,19 @@ export async function onRequest(context) {
       return json({ ok: false, error: "请先确认已完成官网信息录入。" }, 400);
     }
 
+    const duplicate = await context.env.DB.prepare(
+      `SELECT id
+      FROM member_submissions
+      WHERE wechat_id = ?
+      LIMIT 1`
+    )
+      .bind(wechatId)
+      .first();
+
+    if (duplicate) {
+      return json({ ok: false, error: "该微信号已提交过，请使用查询/更新已有信息。" }, 409);
+    }
+
     await context.env.DB.prepare(
       `INSERT INTO member_submissions (
         member_type,

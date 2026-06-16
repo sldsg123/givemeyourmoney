@@ -102,6 +102,19 @@ async function handleSubmit(request, env) {
       return json({ ok: false, error: "请先确认已完成官网信息录入。" }, 400);
     }
 
+    const duplicate = await env.DB.prepare(
+      `SELECT id
+      FROM member_submissions
+      WHERE wechat_id = ?
+      LIMIT 1`
+    )
+      .bind(wechatId)
+      .first();
+
+    if (duplicate) {
+      return json({ ok: false, error: "该微信号已提交过，请使用查询/更新已有信息。" }, 409);
+    }
+
     await env.DB.prepare(
       `INSERT INTO member_submissions (
         member_type,
@@ -290,7 +303,20 @@ async function handleUpdate(request, env) {
       return json({ ok: false, error: "记录已变化，请重新查询后再更新。" }, 409);
     }
 
-    const result = await env.DB.prepare(
+    const duplicate = await env.DB.prepare(
+      `SELECT id
+      FROM member_submissions
+      WHERE wechat_id = ? AND id != ?
+      LIMIT 1`
+    )
+      .bind(wechatId, id)
+      .first();
+
+    if (duplicate) {
+      return json({ ok: false, error: "该微信号已被其他记录使用。" }, 409);
+    }
+
+    await env.DB.prepare(
       `UPDATE member_submissions
       SET
         member_type = ?,

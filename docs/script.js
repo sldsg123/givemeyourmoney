@@ -498,7 +498,7 @@
       localStorage.setItem(storageKey, JSON.stringify(record));
       renderPreview(record);
     } catch (error) {
-      setStatus("提交失败，请稍后再试。", "error");
+      setStatus(error.message || "提交失败，请稍后再试。", "error");
     } finally {
       submitButton.disabled = false;
     }
