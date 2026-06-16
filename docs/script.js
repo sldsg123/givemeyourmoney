@@ -31,6 +31,7 @@
   const updateNewMemberOnlyFields = document.querySelectorAll(
     "[data-update-new-member-only]"
   );
+  const qrTriggers = document.querySelectorAll("[data-qr-trigger]");
   const storageKey = "latestMemberInfoSubmission";
   const endpoint = window.FORM_ENDPOINT || "";
   const isLocalStaticServer =
@@ -262,6 +263,42 @@
   });
 
   updateMemberType?.addEventListener("change", setUpdateFlow);
+
+  qrTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const popover = trigger.closest(".qr-popover");
+      const isOpen = popover?.dataset.open === "true";
+
+      qrTriggers.forEach((item) => {
+        item.setAttribute("aria-expanded", "false");
+        item.closest(".qr-popover")?.removeAttribute("data-open");
+      });
+
+      if (popover && !isOpen) {
+        popover.dataset.open = "true";
+        trigger.setAttribute("aria-expanded", "true");
+      }
+    });
+  });
+
+  document.addEventListener("click", () => {
+    qrTriggers.forEach((trigger) => {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.closest(".qr-popover")?.removeAttribute("data-open");
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") {
+      return;
+    }
+
+    qrTriggers.forEach((trigger) => {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.closest(".qr-popover")?.removeAttribute("data-open");
+    });
+  });
 
   lookupForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
