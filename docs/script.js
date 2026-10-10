@@ -322,6 +322,12 @@
     const formData = new FormData(lookupForm);
     const name = String(formData.get("name") || "").trim();
     const wechatId = String(formData.get("wechatId") || "").trim();
+
+    if (!name && !wechatId) {
+      setLookupStatus("请填写姓名或微信号。", "error");
+      return;
+    }
+
     const payload = new URLSearchParams();
     payload.set("name", name);
     payload.set("wechatId", wechatId);
@@ -345,7 +351,7 @@
         throw new Error(result.error || "查询失败");
       }
 
-      fillUpdateForm(result.record, name, wechatId);
+      fillUpdateForm(result.record, result.record.name, result.record.wechatId);
       setLookupStatus("已找到记录，可以更新信息。", "success");
     } catch (error) {
       if (updateForm) {

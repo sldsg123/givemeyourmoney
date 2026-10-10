@@ -185,8 +185,21 @@ async function handleLookup(request, env) {
       return json({ ok: false, error: "D1 数据库未绑定。" }, 500);
     }
 
-    if (!name || !wechatId) {
-      return json({ ok: false, error: "请填写姓名和微信号。" }, 400);
+    if (!name && !wechatId) {
+      return json({ ok: false, error: "请填写姓名或微信号。" }, 400);
+    }
+
+    const lookupConditions = [];
+    const lookupValues = [];
+
+    if (name) {
+      lookupConditions.push("name = ?");
+      lookupValues.push(name);
+    }
+
+    if (wechatId) {
+      lookupConditions.push("wechat_id = ?");
+      lookupValues.push(wechatId);
     }
 
     const record = await env.DB.prepare(
@@ -208,11 +221,11 @@ async function handleLookup(request, env) {
         notes,
         submitted_at
       FROM member_submissions
-      WHERE name = ? AND wechat_id = ?
+      WHERE ${lookupConditions.join(" AND ")}
       ORDER BY id DESC
       LIMIT 1`
     )
-      .bind(name, wechatId)
+      .bind(...lookupValues)
       .first();
 
     if (!record) {

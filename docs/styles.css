@@ -457,6 +457,13 @@ textarea::placeholder {
   margin-bottom: 18px;
 }
 
+.lookup-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .update-form {
   border-top: 1px solid var(--line);
   padding-top: 18px;
