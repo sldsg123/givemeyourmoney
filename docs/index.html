@@ -358,7 +358,18 @@
             <input name="notes" type="text" maxlength="500" />
           </label>
 
-          <button class="submit-button" type="submit">保存更新</button>
+          <div class="update-actions">
+            <button class="submit-button" type="submit">
+              保存更新并确认地址
+            </button>
+            <button
+              class="secondary-button"
+              type="button"
+              data-confirm-address
+            >
+              无需更新，确认地址
+            </button>
+          </div>
         </form>
       </dialog>
 

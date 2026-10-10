@@ -22,6 +22,7 @@
   const updateForm = document.querySelector("[data-update-form]");
   const lookupStatus = document.querySelector("[data-lookup-status]");
   const updateMemberType = document.querySelector("[data-update-member-type]");
+  const confirmAddressButton = document.querySelector("[data-confirm-address]");
   const updateRenewalOnlyFields = document.querySelectorAll(
     "[data-update-renewal-only]"
   );
@@ -264,6 +265,56 @@
 
   updateMemberType?.addEventListener("change", setUpdateFlow);
 
+  confirmAddressButton?.addEventListener("click", async () => {
+    if (!updateForm) {
+      return;
+    }
+
+    const confirmEndpoint = getApiEndpoint("confirm-address");
+    if (!confirmEndpoint) {
+      setLookupStatus("确认接口未配置。", "error");
+      return;
+    }
+
+    const payload = new URLSearchParams();
+    payload.set("id", String(updateForm.elements.id.value || ""));
+    payload.set("lookupName", String(updateForm.elements.lookupName.value || ""));
+    payload.set(
+      "lookupWechatId",
+      String(updateForm.elements.lookupWechatId.value || "")
+    );
+
+    const buttons = updateForm.querySelectorAll("button");
+    buttons.forEach((button) => {
+      button.disabled = true;
+    });
+
+    try {
+      setLookupStatus("正在确认地址...");
+      const response = await fetch(confirmEndpoint, {
+        method: "POST",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+        },
+        body: payload,
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "确认失败");
+      }
+
+      fillUpdateForm(result.record, result.record.name, result.record.wechatId);
+      setLookupStatus("地址已确认。", "success");
+    } catch (error) {
+      setLookupStatus(error.message || "确认失败，请稍后再试。", "error");
+    } finally {
+      buttons.forEach((button) => {
+        button.disabled = false;
+      });
+    }
+  });
+
   qrTriggers.forEach((trigger) => {
     trigger.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -422,10 +473,10 @@
     payload.set("pageUrl", window.location.href);
     payload.set("userAgent", navigator.userAgent);
 
-    const updateButton = updateForm.querySelector("button[type='submit']");
-    if (updateButton) {
-      updateButton.disabled = true;
-    }
+    const updateButtons = updateForm.querySelectorAll("button");
+    updateButtons.forEach((button) => {
+      button.disabled = true;
+    });
 
     try {
       setLookupStatus("正在保存更新...");
@@ -443,13 +494,13 @@
       }
 
       fillUpdateForm(result.record, result.record.name, result.record.wechatId);
-      setLookupStatus("信息已更新。", "success");
+      setLookupStatus("信息已更新，地址已确认。", "success");
     } catch (error) {
       setLookupStatus(error.message || "更新失败，请稍后再试。", "error");
     } finally {
-      if (updateButton) {
-        updateButton.disabled = false;
-      }
+      updateButtons.forEach((button) => {
+        button.disabled = false;
+      });
     }
   });
 

@@ -26,6 +26,10 @@ export default {
       return handleUpdate(request, env);
     }
 
+    if (url.pathname === "/api/confirm-address") {
+      return handleConfirmAddress(request, env);
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
@@ -217,6 +221,7 @@ async function handleLookup(request, env) {
         official_registration_complete,
         member_gift_needed,
         shipping_address,
+        address_confirmed,
         paid,
         notes,
         submitted_at
@@ -343,6 +348,7 @@ async function handleUpdate(request, env) {
         official_registration_complete = ?,
         member_gift_needed = ?,
         shipping_address = ?,
+        address_confirmed = true,
         paid = ?,
         notes = ?,
         page_url = ?,
@@ -386,6 +392,7 @@ async function handleUpdate(request, env) {
         official_registration_complete,
         member_gift_needed,
         shipping_address,
+        address_confirmed,
         paid,
         notes,
         submitted_at
@@ -399,6 +406,84 @@ async function handleUpdate(request, env) {
   } catch (error) {
     console.error(error);
     return json({ ok: false, error: "更新失败。" }, 500);
+  }
+}
+
+async function handleConfirmAddress(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: jsonHeaders,
+    });
+  }
+
+  if (request.method !== "POST") {
+    return json({ ok: false, error: "Method not allowed." }, 405);
+  }
+
+  try {
+    const params = await readParams(request);
+    const id = Number(clean(params.get("id"), 20));
+    const lookupName = clean(params.get("lookupName"), 120);
+    const lookupWechatId = clean(params.get("lookupWechatId"), 120);
+
+    if (!env.DB) {
+      return json({ ok: false, error: "D1 数据库未绑定。" }, 500);
+    }
+
+    if (!Number.isInteger(id) || id < 1 || !lookupName || !lookupWechatId) {
+      return json({ ok: false, error: "查询记录无效，请重新查询。" }, 400);
+    }
+
+    const existing = await env.DB.prepare(
+      `SELECT id
+      FROM member_submissions
+      WHERE id = ? AND name = ? AND wechat_id = ?`
+    )
+      .bind(id, lookupName, lookupWechatId)
+      .first();
+
+    if (!existing) {
+      return json({ ok: false, error: "记录已变化，请重新查询后再确认。" }, 409);
+    }
+
+    await env.DB.prepare(
+      `UPDATE member_submissions
+      SET address_confirmed = true
+      WHERE id = ? AND name = ? AND wechat_id = ?`
+    )
+      .bind(id, lookupName, lookupWechatId)
+      .run();
+
+    const updated = await env.DB.prepare(
+      `SELECT
+        id,
+        created_at,
+        member_type,
+        member_type_label,
+        name,
+        wechat_id,
+        adults,
+        junior,
+        member_names,
+        has_info_change,
+        official_registration_complete,
+        member_gift_needed,
+        shipping_address,
+        address_confirmed,
+        paid,
+        notes,
+        submitted_at
+      FROM member_submissions
+      WHERE id = ?`
+    )
+      .bind(id)
+      .first();
+
+    return json({ ok: true, record: toClientRecord(updated) });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "地址确认失败。" }, 500);
   }
 }
 
@@ -430,6 +515,7 @@ function toClientRecord(record) {
     officialRegistrationComplete: record.official_registration_complete || "",
     memberGiftNeeded: record.member_gift_needed || "",
     shippingAddress: record.shipping_address,
+    addressConfirmed: Boolean(record.address_confirmed),
     paid: record.paid || "否",
     notes: record.notes || "",
     submittedAt: record.submitted_at || "",
