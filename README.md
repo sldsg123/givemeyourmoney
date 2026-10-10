@@ -175,7 +175,7 @@ LIMIT 10;
 
 1. 打开 Cloudflare Worker。
 2. 进入 **Settings > Domains & Routes** 或 **Triggers > Custom Domains**。
-3. 添加 `www.givemeyourmoney.online`。
+3. 添加 `interclubchao.org` 和 `www.interclubchao.org`。
 4. 如果域名 DNS 已经在 Cloudflare，Cloudflare 会自动配置记录。
 5. 如果 DNS 不在 Cloudflare，建议先把域名的 nameservers 切到 Cloudflare，
    再用 Cloudflare 的 Custom Domain 流程绑定。

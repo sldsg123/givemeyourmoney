@@ -5,7 +5,11 @@
   "compatibility_date": "2026-05-19",
   "routes": [
     {
-      "pattern": "www.givemeyourmoney.online",
+      "pattern": "interclubchao.org",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.interclubchao.org",
       "custom_domain": true
     }
   ],
