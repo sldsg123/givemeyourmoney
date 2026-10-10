@@ -97,6 +97,14 @@ ALTER TABLE member_submissions
 ADD COLUMN member_gift_needed TEXT NOT NULL DEFAULT '';
 ```
 
+如果数据库已经创建过，并且只是给现有表增加“地址已确认”字段，请进入 D1
+的 **Console**，执行 `cloudflare/add_address_confirmed_column.sql`：
+
+```sql
+ALTER TABLE member_submissions
+ADD COLUMN address_confirmed BOOLEAN NOT NULL DEFAULT false;
+```
+
 ### 2. 创建 Cloudflare Worker 项目
 
 1. 进入 **Workers & Pages**。
@@ -160,6 +168,7 @@ SELECT
   official_registration_complete,
   member_gift_needed,
   shipping_address,
+  address_confirmed,
   paid,
   notes
 FROM member_submissions

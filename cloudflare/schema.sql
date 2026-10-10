@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS member_submissions (
   official_registration_complete TEXT,
   member_gift_needed TEXT NOT NULL DEFAULT '',
   shipping_address TEXT NOT NULL,
+  address_confirmed BOOLEAN NOT NULL DEFAULT false,
   paid TEXT NOT NULL DEFAULT '否',
   notes TEXT,
   page_url TEXT,
