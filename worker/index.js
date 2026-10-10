@@ -30,6 +30,14 @@ export default {
       return handleConfirmAddress(request, env);
     }
 
+    if (
+      url.pathname === "/confirmaddress" ||
+      url.pathname === "/confirmaddress/"
+    ) {
+      url.pathname = "/";
+      return env.ASSETS.fetch(new Request(url, request));
+    }
+
     return env.ASSETS.fetch(request);
   },
 };

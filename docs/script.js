@@ -35,6 +35,8 @@
   const qrTriggers = document.querySelectorAll("[data-qr-trigger]");
   const storageKey = "latestMemberInfoSubmission";
   const endpoint = window.FORM_ENDPOINT || "";
+  const isConfirmAddressPath =
+    window.location.pathname.replace(/\/$/, "") === "/confirmaddress";
   const isLocalStaticServer =
     ["localhost", "127.0.0.1"].includes(window.location.hostname) &&
     window.location.port === "8000";
@@ -206,7 +208,7 @@
       ["微信号", record.wechatId],
       ["成人会员人数", record.adults],
       ["儿童会员人数", record.junior],
-      ["会员姓名", record.memberNames],
+      ["所有会员姓名", record.memberNames],
     ];
 
     if (record.memberType === "renewal") {
@@ -250,7 +252,14 @@
     setStatus("");
   });
 
-  openLookup?.addEventListener("click", () => {
+  openLookup?.addEventListener("click", (event) => {
+    if (openLookup.getAttribute("href") === "/confirmaddress") {
+      event.preventDefault();
+      if (!isConfirmAddressPath) {
+        window.history.pushState({}, "", "/confirmaddress");
+      }
+    }
+
     setLookupStatus("");
     openLookupDialog();
   });
@@ -264,6 +273,11 @@
   });
 
   updateMemberType?.addEventListener("change", setUpdateFlow);
+
+  if (isConfirmAddressPath) {
+    setLookupStatus("");
+    openLookupDialog();
+  }
 
   confirmAddressButton?.addEventListener("click", async () => {
     if (!updateForm) {
