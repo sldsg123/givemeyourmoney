@@ -267,7 +267,14 @@
   closeLookup?.addEventListener("click", closeLookupDialog);
 
   lookupDialog?.addEventListener("click", (event) => {
-    if (event.target === lookupDialog) {
+    const dialogBounds = lookupDialog.getBoundingClientRect();
+    const isBackdropClick =
+      event.clientX < dialogBounds.left ||
+      event.clientX > dialogBounds.right ||
+      event.clientY < dialogBounds.top ||
+      event.clientY > dialogBounds.bottom;
+
+    if (isBackdropClick) {
       closeLookupDialog();
     }
   });
