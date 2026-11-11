@@ -1,3 +1,5 @@
+import { handleShipping } from "./shipping.js";
+
 const MEMBER_TYPE_LABELS = {
   renewal: "旧会员续费",
   new: "新会员入会",
@@ -13,6 +15,15 @@ const jsonHeaders = {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/shipping") {
+      return handleShipping(request, env);
+    }
+
+    if (url.pathname === "/2026shipping" || url.pathname === "/2026shipping/") {
+      url.pathname = "/shipping.html";
+      return env.ASSETS.fetch(new Request(url, request));
+    }
 
     if (url.pathname === "/api/submit") {
       return handleSubmit(request, env);

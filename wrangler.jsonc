@@ -16,7 +16,7 @@
   "assets": {
     "directory": "./docs",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": ["/api/*", "/confirmaddress", "/confirmaddress/", "/2026shipping", "/2026shipping/"]
   },
   "d1_databases": [
     {

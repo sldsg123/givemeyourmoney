@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS member_submissions (
   member_gift_needed TEXT NOT NULL DEFAULT '',
   shipping_address TEXT NOT NULL,
   address_confirmed BOOLEAN NOT NULL DEFAULT false,
+  shipped_flag INTEGER NOT NULL DEFAULT 0 CHECK (shipped_flag IN (0, 1)),
   paid TEXT NOT NULL DEFAULT '否',
   notes TEXT,
   page_url TEXT,
@@ -22,3 +23,6 @@ CREATE TABLE IF NOT EXISTS member_submissions (
 
 CREATE INDEX IF NOT EXISTS idx_member_submissions_created_at
 ON member_submissions (created_at);
+
+CREATE INDEX IF NOT EXISTS idx_member_submissions_shipping
+ON member_submissions (address_confirmed, shipped_flag, id);

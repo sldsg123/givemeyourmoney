@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>2026 邮寄管理 | Inter Club Chao CN</title>
+    <link rel="icon" type="image/png" href="/images/favicon.png?v=1" />
+    <link rel="stylesheet" href="/shipping.css" />
+    <script src="/shipping.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <img src="/images/favicon.png?v=1" width="34" height="34" alt="国际米兰队徽" />
+        <span>Inter Club Chao CN</span>
+      </a>
+      <div class="header-actions">
+        <a href="/confirmaddress">地址确认</a>
+        <button type="button" class="text-button" data-logout hidden>退出管理</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="page-heading">
+        <div><p class="eyebrow">INTER CLUB CHAO CN</p><h1>2026 邮寄管理</h1></div>
+        <button type="button" class="secondary-button" data-refresh hidden>刷新列表</button>
+      </div>
+
+      <form class="login-form" data-login>
+        <h2>管理员登录</h2>
+        <label for="admin-password">管理员口令</label>
+        <input id="admin-password" name="password" type="password" autocomplete="current-password" required maxlength="512" />
+        <button type="submit" class="primary-button">进入邮寄管理</button>
+      </form>
+
+      <p class="status" data-status role="status" aria-live="polite"></p>
+
+      <section data-workspace hidden aria-label="会员邮寄信息">
+        <div class="summary" aria-label="邮寄概览">
+          <button type="button" data-view="ready"><span>待寄出</span><strong data-count="ready">0</strong></button>
+          <button type="button" data-view="unconfirmed"><span>地址未确认</span><strong data-count="unconfirmed">0</strong></button>
+          <button type="button" data-view="shipped"><span>已寄出</span><strong data-count="shipped">0</strong></button>
+          <button type="button" data-view="all"><span>全部登记</span><strong data-count="total">0</strong></button>
+        </div>
+
+        <form class="filters" data-filters>
+          <label>地址状态
+            <select name="confirmed"><option value="1">已确认地址</option><option value="0">未确认地址</option><option value="all">全部地址状态</option></select>
+          </label>
+          <label>邮寄状态
+            <select name="shipped"><option value="0">未寄出</option><option value="1">已寄出</option><option value="all">全部邮寄状态</option></select>
+          </label>
+          <label class="search-field">搜索会员
+            <input name="search" type="search" maxlength="120" placeholder="姓名、微信号、所有会员姓名" />
+          </label>
+          <button type="submit" class="primary-button">查询</button>
+          <button type="button" class="text-button" data-reset>重置筛选</button>
+        </form>
+
+        <div class="list-heading"><h2 data-list-title>待寄出会员</h2><span data-result-count>0 条记录</span></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="会员邮寄列表">
+          <table>
+            <thead><tr><th scope="col">联系人 / 微信号</th><th scope="col">所有会员姓名</th><th scope="col">会员信息</th><th scope="col">付款 / 礼品</th><th scope="col">物流地址</th><th scope="col">状态</th><th scope="col">备注</th><th scope="col">操作</th></tr></thead>
+            <tbody data-records></tbody>
+          </table>
+        </div>
+        <p class="empty" data-empty hidden>当前筛选下没有会员记录。</p>
+        <nav class="pagination" aria-label="列表分页">
+          <button type="button" class="secondary-button" data-prev disabled>上一页</button>
+          <span data-page>第 1 / 1 页</span>
+          <button type="button" class="secondary-button" data-next disabled>下一页</button>
+        </nav>
+      </section>
+    </main>
+
+    <dialog class="editor" data-editor aria-labelledby="editor-title">
+      <div class="dialog-heading"><h2 id="editor-title">编辑物流地址</h2><button type="button" class="close-button" aria-label="关闭地址编辑" title="关闭" data-close>&times;</button></div>
+      <p class="record-name" data-editor-member></p>
+      <form data-address-form>
+        <label for="shipping-address">物流地址（包括收件人姓名和电话）</label>
+        <textarea id="shipping-address" name="shippingAddress" rows="5" maxlength="1000" required></textarea>
+        <label class="checkbox-row"><input name="addressConfirmed" type="checkbox" /><span>地址已确认</span></label>
+        <p class="status" data-editor-status role="status" aria-live="polite"></p>
+        <div class="dialog-actions"><button type="button" class="secondary-button" data-cancel>取消</button><button type="submit" class="primary-button">保存地址</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="editor" data-shipment-dialog aria-labelledby="shipment-title">
+      <h2 id="shipment-title">确认邮寄状态</h2>
+      <p data-shipment-message></p>
+      <p class="shipment-address" data-shipment-address></p>
+      <p class="status" data-shipment-status role="status" aria-live="polite"></p>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-shipment-cancel>取消</button><button type="button" class="primary-button" data-shipment-confirm>确认寄出</button></div>
+    </dialog>
+  </body>
+</html>

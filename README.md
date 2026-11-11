@@ -169,6 +169,7 @@ SELECT
   member_gift_needed,
   shipping_address,
   address_confirmed,
+  shipped_flag,
   paid,
   notes
 FROM member_submissions
@@ -190,6 +191,57 @@ LIMIT 10;
    再用 Cloudflare 的 Custom Domain 流程绑定。
 
 完成后，用正式域名测试提交。
+
+## 2026 邮寄管理
+
+管理页：`https://www.interclubchao.org/2026shipping`。
+
+默认显示地址已确认且未寄出的记录，可以筛选未确认地址、已寄出或全部登记，
+并按姓名、微信号、所有会员姓名搜索。列表每页 50 条；统计数字为全库统计。
+页面名中的 2026 是业务入口名称，不会按登记时间排除已有会员。
+
+上线前，先在现有 D1 数据库的 Console 执行一次
+`cloudflare/add_shipped_flag_column.sql`：
+
+```sql
+ALTER TABLE member_submissions
+ADD COLUMN shipped_flag INTEGER NOT NULL DEFAULT 0 CHECK (shipped_flag IN (0, 1));
+
+CREATE INDEX IF NOT EXISTS idx_member_submissions_shipping
+ON member_submissions (address_confirmed, shipped_flag, id);
+```
+
+已有记录和新登记默认都是未寄出（0）；标记寄出为 1，可以撤销寄出。
+编辑地址时可以同时勾选“地址已确认”。未确认地址的记录不能标记寄出。
+标记寄出只修改邮寄状态；修改地址不会改变付款、会员信息和寄出状态。
+
+在 Cloudflare Worker 的 **Settings > Variables and Secrets** 中新增 Secret：
+
+```text
+SHIPPING_ADMIN_PASSWORD
+```
+
+值设为管理员口令，保存并部署。也可通过 `npx wrangler secret put
+SHIPPING_ADMIN_PASSWORD` 交互式设置，不要把真实口令写进 Git。
+每次打开管理页输入这个口令，口令只保留在当前页面内存，刷新需重新登录。
+管理接口 `/api/shipping` 的查询与写入都校验口令；未配置口令时不会返回会员数据。
+完成数据库迁移、配置 Secret 后，再推送并部署本次代码。
+
+本地预览使用 Node.js 22.13+（内置 SQLite），只操作内存里的 64 条虚构记录：
+
+```sh
+npm run dev:shipping
+```
+
+打开 `http://localhost:8788/2026shipping`，本地口令为 `local-shipping-only`。
+本地测试和线上 D1 完全独立，关闭预览后测试数据会清空。
+端口被占用时，可以用 `PORT=8789 npm run dev:shipping`。
+
+运行接口与迁移测试：
+
+```sh
+npm test
+```
 
 ## 清除本地测试数据
 
